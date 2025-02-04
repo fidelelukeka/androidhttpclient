@@ -28,6 +28,9 @@ class MainViewModel : ViewModel() {
     }
     private val apiService = APIServiceImpl(client)
 
+    private var _isDialogVisible : MutableState<Boolean> = mutableStateOf(false)
+    val isDialogVisible : State<Boolean> = _isDialogVisible
+
     private var _isLoading = mutableStateOf(false)
     val isLoading : State<Boolean> = _isLoading
 
@@ -80,6 +83,7 @@ class MainViewModel : ViewModel() {
                     _errorMessage.value = "Post with id " + postUpdated.id + " is updated"
                 }
                 _isLoading.value = false
+                _activePost.value = Post()
             }
         }catch (e : Exception){
             _errorMessage.value =  e.message
@@ -103,4 +107,34 @@ class MainViewModel : ViewModel() {
             _isLoading.value = false
         }
     }
+
+    fun createOrUpdatePost(){
+        if(_activePost.value.id == null){
+            createPost()
+        }else{
+            updatePost()
+        }
+    }
+
+    fun isDialogVisibleChange(value : Boolean){
+     _isDialogVisible.value = value
+    }
+
+    fun onTitleValueChange(text : String){
+        _activePost.value = _activePost.value.copy(title = text)
+    }
+
+    fun onBodyValueChange(text : String){
+        _activePost.value = _activePost.value.copy(body = text)
+    }
+
+    fun onPostActiveChange(post : Post){
+     _activePost.value = post
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        client.close()
+    }
+
 }
